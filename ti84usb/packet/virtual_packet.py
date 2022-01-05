@@ -1,4 +1,5 @@
 from ti84usb import packet
+from warnings import warn
 
 
 class VirtualPacket(packet.Packet):
@@ -39,8 +40,18 @@ class VirtualPacket(packet.Packet):
         assert len(b) > 6, "Invalid packet: too small"  # Extra byte in header
         assert len(b) == 6 + int.from_bytes(b[0:4], 'big'), "Packet size mismatch"
 
-        return VirtualPacket(
-            subtype=b[5],
-            data=b[6:],
-            is_final=(b[4] == 4)
-        )
+        types = {
+            1: packet.SetModePacket,
+        }
+
+        if b[5] not in types.keys():
+            warn(f"Virtual packet has invalid subtype: {b[5]}. Creating generic")
+            return VirtualPacket(
+                subtype=b[5],
+                data=b[6:],
+                is_final=(b[4] == 4)
+            )
+
+        packet_type = types[b[5]]
+
+        return packet_type.from_bytes(b)

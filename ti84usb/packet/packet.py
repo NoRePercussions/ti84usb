@@ -1,6 +1,7 @@
 import ti84usb as ti
 import ti84usb.util as util
 import ti84usb.packet as packet
+from warnings import warn
 
 class Packet:
     type: int
@@ -39,7 +40,9 @@ class Packet:
             5: packet.VirtualPacketAcknowledgement,
         }
 
-        assert b[4] in types.keys(), f"Invalid packet type: {b[4]}"
+        if b[4] not in types.keys():
+            warn(f"Packet has invalid type: {b[4]}. Creating generic")
+            return Packet(type=b[4], data=b[5:])
 
-        proper = types[b[4]]
-        return proper.from_bytes(b)
+        packet_type = types[b[4]]
+        return packet_type.from_bytes(b)
