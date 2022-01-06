@@ -3,7 +3,7 @@ from ti84usb.packet import VirtualPacket
 
 class SetModePacket(VirtualPacket):
     type = 4
-    subtype = 1
+    subtype = 0x0001
     is_final = True
 
     constant: int = (2000).to_bytes(4, 'big')

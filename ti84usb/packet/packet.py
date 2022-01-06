@@ -37,7 +37,7 @@ class Packet:
             2: packet.BufferSizeAllocationPacket,
             3: packet.VirtualPacket,
             4: packet.VirtualPacket,
-            5: packet.VirtualPacketAcknowledgement,
+            5: packet.AckVirtualPacket,
         }
 
         if b[4] not in types.keys():

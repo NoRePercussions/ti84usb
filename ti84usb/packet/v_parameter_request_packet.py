@@ -1,0 +1,50 @@
+from ti84usb.packet import VirtualPacket
+
+
+class ParameterRequestPacket(VirtualPacket):
+    type = 4
+    subtype = 0x0007
+    is_final = True
+
+    params: list
+
+    def __init__(self, params):
+        if type(params) is not list:
+            self.params = [params]
+        elif type(params[0]) is int:
+            self.params = params
+        else:
+            self.params = [int.from_bytes(b, 'big') for b in params]
+
+    def _list(self):
+        return [
+            len(self)         .to_bytes(4, 'big'),
+            self.type         .to_bytes(1, 'big'),
+            self.subtype      .to_bytes(1, 'big'),
+            self._num_params().to_bytes(2, 'big'),
+            b''.join(self._byte_params())
+        ]
+
+    def _raw_data(self):
+        num_params = self._num_params().to_bytes(2, 'big')
+        byte_params = b''.join(self._byte_params())
+        return num_params + byte_params
+
+    def _num_params(self):
+        return len(self.params)
+
+    def _byte_params(self):
+        return [p.to_bytes(2, 'big') for p in self.params]
+
+    @staticmethod
+    def from_bytes(b):
+        assert len(b) > 6, "Invalid packet: too small"  # Extra byte in header
+        assert len(b) == 6 + int.from_bytes(b[0:4], 'big'), "Packet size mismatch"
+
+        # 0  1  2  3   4  5   6  7   8  9   10 11
+        # LL LL LL LL  TT ST  NN NN  II II  II II ...
+        num_params = int.from_bytes(b[6:8], 'big')
+        params = [b[i:i+2] for i in range(8, 8 + 4*num_params, 4)]
+        return ParameterRequestPacket(
+            params=params
+        )

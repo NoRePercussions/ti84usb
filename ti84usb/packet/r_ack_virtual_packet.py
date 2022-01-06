@@ -2,7 +2,7 @@ from ti84usb import packet
 from warnings import warn
 
 
-class VirtualPacketAcknowledgement(packet.Packet):
+class AckVirtualPacket(packet.Packet):
     type: int = 5
     data: bytes
 
@@ -24,4 +24,4 @@ class VirtualPacketAcknowledgement(packet.Packet):
         assert len(b) == 7, "Invalid acknowledgement packet: wrong size"
         if b[5:7] != b'\xE0\x00':
             warn(f"Invalid ACK code 0x{b[5:7].hex().upper()}")
-        return VirtualPacketAcknowledgement(b[5:7])
+        return AckVirtualPacket(b[5:7])
