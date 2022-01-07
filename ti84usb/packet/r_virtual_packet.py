@@ -2,79 +2,73 @@ from ti84usb import packet
 from warnings import warn
 
 
+# Todo: Implemented incorrectly! LLLLLLLL TT LLLLLLLL TTTT DDDDDD...
 class VirtualPacket(packet.Packet):
     type: int
-    subtype = None  # remove? idk allows for generics-ish
     data: bytes
-    is_start: bool
-    is_final: bool
 
-    def __init__(self, data, is_start=True, is_final=True):
+    def __init__(self, data, is_final=True):
         self.type = 4 if is_final else 3
         self.data = data
-        self.is_start = is_start
-        self.is_final = is_final
 
     def __len__(self):
-        length = len(self._raw_data())
-        # Todo: ensure either both are mut.ex. or else this works
-        if type(self) is VirtualPacket and self.is_start and not self.is_final:
-            return length-1
-        else:
-            return length
+        return 6 + len(self._raw_data())
 
     def _raw_data(self):
         return self.data
 
     def _list(self):
         # Test if self is not a child so children don't check params
-        if type(self) is not VirtualPacket or self.is_start and self.is_final:
+        if type(self) is not VirtualPacket:
             return [
                 len(self).to_bytes(4, 'big'),
                 self.type.to_bytes(1, 'big'),
-                self.subtype.to_bytes(1, 'big'),
+                len(self._raw_data()).to_bytes(4, 'big'),
+                self.subtype.to_bytes(2, 'big'),
                 self._raw_data()
             ]
         else:
             return [
-                len(self).to_bytes(4, 'big'),
+                len(self._raw_data()).to_bytes(4, 'big'),
                 self.type.to_bytes(1, 'big'),
                 self._raw_data()
             ]
 
     def __add__(self, other):
         assert isinstance(other, VirtualPacket), "Can only append with another virtual packet"
-        assert not self.is_final, "Cannot append a final packet to another packet"
-        assert not other.is_start, "Cannot append a packet to a start packet"
+        assert self.type == 0x3, "Cannot append a final packet to another packet"
 
-        is_complete = self.is_start and other.is_final
-
-        # Merge raw data
+        # Merge raw packet data
         concat = self._raw_data() + other._raw_data()
         # If the new packet is a start packet,
         #   length will not include subtype
-        length = len(concat)-1 if self.is_start else len(concat)
+        length = len(concat)
 
-        type = b'\x04' if other.is_final else b'\x03'
+        type = other.type
 
         return VirtualPacket.from_bytes(
-            length.to_bytes(4, 'big') + type + concat
+            len(concat).to_bytes(4, 'big') +
+            type.to_bytes(1, 'big') +
+            concat
         )
 
     @staticmethod
-    def from_bytes(b):
+    def from_bytes(b, auto_type=True):
         # Determine if this is a valid vpacket
-        is_start = (6 + int.from_bytes(b[0:4], 'big') == len(b))
         is_final = (b[4] == 4)
+        is_valid = is_final and (len(b)-11 == int.from_bytes(b[5:9], 'big'))
+
+        t = int.from_bytes(b[9:11], 'big')
 
         types = {
             0x0001: packet.SetModePacket,
             0x0007: packet.ParameterRequestPacket,
+            0x0008: packet.ParameterDataPacket,
             0x0012: packet.AckSetModePacket,
         }
 
-        if is_start and is_final:
-            packet_type = types[b[5]]
+        if auto_type and is_valid and t in types:
+            packet_type = types[t]
             return packet_type.from_bytes(b)
 
-        return VirtualPacket(b[5:], is_start=is_start, is_final=is_final)
+        return VirtualPacket(b[5:], is_final=is_final)

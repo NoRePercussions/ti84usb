@@ -26,9 +26,9 @@ class SetModePacket(VirtualPacket):
 
     @staticmethod
     def from_bytes(b):
-        assert len(b) == 6 + 10, "Invalid packet: wrong size"
+        assert len(b) == 5 + 6 + 10, "Invalid packet: wrong size"
 
         return SetModePacket(
-            mode=b[6:12],
-            constant=b[12:]
+            mode=b[11:17],
+            constant=b[17:]
         )

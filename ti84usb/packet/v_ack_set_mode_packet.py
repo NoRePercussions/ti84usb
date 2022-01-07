@@ -16,7 +16,7 @@ class AckSetModePacket(VirtualPacket):
 
     @staticmethod
     def from_bytes(b):
-        assert len(b) == 6 + 4, "Invalid packet: wrong size"
+        assert len(b) == 5 + 6 + 6, "Invalid packet: wrong size"
 
         return AckSetModePacket(
             constant=b[6:]

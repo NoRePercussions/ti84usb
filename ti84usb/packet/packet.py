@@ -46,3 +46,8 @@ class Packet:
 
         packet_type = types[b[4]]
         return packet_type.from_bytes(b)
+
+    @staticmethod
+    def from_hex(h):
+        h = h.strip()
+        return Packet.from_bytes(bytes.fromhex(h))
