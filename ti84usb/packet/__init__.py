@@ -14,10 +14,10 @@ from .v_ack_EOT_packet import AckEOTPacket
 from .v_parameter_request_packet import ParameterRequestPacket
 from .v_parameter_data_packet import ParameterDataPacket
 from .v_request_directory_listing import RequestDirectoryListingPacket
-# 0x000A
-# 0x000B
+from .v_variable_header_packet import VariableHeaderPacket
+from .v_request_to_send_variable import RequestToSendVariablePacket
 # 0x000C
-# 0x000D
+from .v_variable_contents_packet import VariableContentsPacket
 # 0x000E
 # 0x0010
 # 0x0011

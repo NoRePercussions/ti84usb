@@ -66,6 +66,8 @@ class VirtualPacket(packet.Packet):
             0x0007: packet.ParameterRequestPacket,
             0x0008: packet.ParameterDataPacket,
             0x0009: packet.RequestDirectoryListingPacket,
+            0x000A: packet.VariableHeaderPacket,
+            0x000B: packet.RequestToSendVariablePacket,
 
             0x0012: packet.AckSetModePacket,
             0xAA00: packet.AckDataPacket,
