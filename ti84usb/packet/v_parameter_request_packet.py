@@ -4,7 +4,6 @@ from ti84usb.packet import VirtualPacket
 class ParameterRequestPacket(VirtualPacket):
     type = 4
     subtype = 0x0007
-    is_final = True
 
     params: list
 
@@ -45,7 +44,7 @@ class ParameterRequestPacket(VirtualPacket):
 
         # 0  1  2  3   4   5  6  7  8   9 10   11 12  13 14  15 16
         # LL LL LL LL  TT  LL LL LL LL  TT TT  NN NN  II II  II II ...
-        num_params = int.from_bytes(b[9:11], 'big')
+        num_params = int.from_bytes(b[11:13], 'big')
         params = [b[i:i+2] for i in range(13, 13 + 4*num_params, 4)]
         return ParameterRequestPacket(
             params=params

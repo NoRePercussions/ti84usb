@@ -4,7 +4,6 @@ from ti84usb.packet import VirtualPacket
 class SetModePacket(VirtualPacket):
     type = 4
     subtype = 0x0001
-    is_final = True
 
     constant: int = (2000).to_bytes(4, 'big')
     mode_template = b'\x00\x0F\x00\x01\x00\x00'

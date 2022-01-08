@@ -5,7 +5,6 @@ from ti84usb.types import Parameter
 class ParameterDataPacket(VirtualPacket):
     type = 4
     subtype = 0x0008
-    is_final = True
 
     params: list
 

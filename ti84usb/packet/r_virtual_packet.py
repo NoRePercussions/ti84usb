@@ -2,7 +2,6 @@ from ti84usb import packet
 from warnings import warn
 
 
-# Todo: Implemented incorrectly! LLLLLLLL TT LLLLLLLL TTTT DDDDDD...
 class VirtualPacket(packet.Packet):
     type: int
     data: bytes
@@ -62,9 +61,15 @@ class VirtualPacket(packet.Packet):
 
         types = {
             0x0001: packet.SetModePacket,
+
+            0x0006: packet.AckEOTPacket,
             0x0007: packet.ParameterRequestPacket,
             0x0008: packet.ParameterDataPacket,
+            0x0009: packet.RequestDirectoryListingPacket,
+
             0x0012: packet.AckSetModePacket,
+            0xAA00: packet.AckDataPacket,
+            0xBB00: packet.ExpectedDelayPacket,
         }
 
         if auto_type and is_valid and t in types:
