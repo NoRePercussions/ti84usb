@@ -1,4 +1,4 @@
-from ti84usb import packet
+from ti84usb import packet, utils
 
 
 class BufferSizeAllocationPacket(packet.Packet):
@@ -10,6 +10,11 @@ class BufferSizeAllocationPacket(packet.Packet):
 
     def _raw_data(self):
         return self.buffer_size.to_bytes(4, 'big')
+
+    def __str__(self):
+        out  = f"Buffer Size Allocation Packet {id(self)}" + "\n"
+        out += f"  Buffer size: {self.buffer_size} bytes"
+        return out
 
     @staticmethod
     def from_bytes(b):

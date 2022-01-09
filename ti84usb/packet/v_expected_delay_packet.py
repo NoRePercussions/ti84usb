@@ -1,10 +1,10 @@
-from ti84usb.packet import VirtualPacket
+from ti84usb import packet, utils
 
 
-class ExpectedDelayPacket(VirtualPacket):
+class ExpectedDelayPacket(packet.VirtualPacket):
     type = 4
     subtype = 0xBB00
-    delay_ms: bytes = (2000).to_bytes(4, 'big')
+    delay_ms: int = (2000).to_bytes(4, 'big')
 
     def __init__(self, delay_ms=120000):
         if delay_ms:
@@ -12,6 +12,11 @@ class ExpectedDelayPacket(VirtualPacket):
 
     def _raw_data(self):
         return self.delay_ms.to_bytes(4, 'big')
+
+    def __str__(self):
+        out  = f"Expected Delay Packet {id(self)}" + "\n"
+        out += f"  Delay: {self.delay_ms} ms"
+        return out
 
     @staticmethod
     def from_bytes(b):

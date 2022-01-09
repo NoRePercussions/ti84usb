@@ -40,6 +40,16 @@ class ParameterDataPacket(VirtualPacket):
     def _byte_params(self):
         return [bytes(p) for p in self.params]
 
+    def __str__(self):
+        out   = f"Parameter Request Packet {id(self)}" + "\n"
+        out  += f"  Parameters:"
+        for p in self.params:
+            if p.is_valid:
+                out += f"\n    {p.id}: 0x{p.data.hex()}"
+            else:
+                out += f"\n    {p.id}: Invalid"
+        return out
+
     @staticmethod
     def from_bytes(b):
         assert len(b) > 6, "Invalid packet: too small"  # Extra byte in header

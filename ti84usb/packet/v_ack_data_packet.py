@@ -1,7 +1,7 @@
-from ti84usb.packet import VirtualPacket
+from ti84usb import packet, utils
 
 
-class AckDataPacket(VirtualPacket):
+class AckDataPacket(packet.VirtualPacket):
     type = 4
     subtype = 0xAA00
     constant = b'\x01'
@@ -12,6 +12,10 @@ class AckDataPacket(VirtualPacket):
 
     def _raw_data(self):
         return self.constant
+
+    def __str__(self):
+        out  = f"ACK Data Packet {id(self)}" + "\n"
+        return out
 
     @staticmethod
     def from_bytes(b):

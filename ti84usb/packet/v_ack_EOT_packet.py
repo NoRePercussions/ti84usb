@@ -1,7 +1,7 @@
-from ti84usb.packet import VirtualPacket
+from ti84usb import packet, utils
 
 
-class AckEOTPacket(VirtualPacket):
+class AckEOTPacket(packet.VirtualPacket):
     type = 4
     subtype = 0x0006
     success: bool
@@ -11,6 +11,11 @@ class AckEOTPacket(VirtualPacket):
 
     def _raw_data(self):
         return b'\x01' if self.success else b'\x00'
+
+    def __str__(self):
+        out   = f"ACK EOT Packet {id(self)}" + "\n"
+        out  += f"  Success: {self.success}"
+        return out
 
     @staticmethod
     def from_bytes(b):

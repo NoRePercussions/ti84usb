@@ -1,8 +1,8 @@
-from ti84usb.packet import VirtualPacket
+from ti84usb import packet, utils
 from ti84usb.types import Parameter
 
 
-class SetParameterPacket(VirtualPacket):
+class SetParameterPacket(packet.VirtualPacket):
     type = 4
     subtype = 0x000E
 
@@ -22,6 +22,11 @@ class SetParameterPacket(VirtualPacket):
 
     def _raw_data(self):
         return bytes(self.param)
+
+    def __str__(self):
+        out  = f"Set Parameter Packet {id(self)}" + "\n"
+        out += f"  Parameter {self.param.id}: 0x{utils.format_bytes(self.param.data)}"
+        return out
 
     @staticmethod
     def from_bytes(b):

@@ -1,3 +1,4 @@
+from ti84usb import utils
 
 
 class Parameter:
@@ -5,11 +6,13 @@ class Parameter:
     is_valid: bool
     data: bytes = None
 
-    def __init__(self, id, is_valid, data=None):
+    def __init__(self, id, is_valid=True, data=None):
         self.id = id
         self.is_valid = is_valid
-        if is_valid:
+        if is_valid and isinstance(data, bytes):
             self.data = data
+        elif is_valid and isinstance(data, int) and is_valid < 16:
+            self.data = data.to_bytes(1, 'big')
 
     def __bytes__(self):
         out = self.id.to_bytes(2, 'big')
@@ -25,6 +28,16 @@ class Parameter:
             out += len(self.data).to_bytes(2, 'big')
             out += self.data
         return out
+
+    def __repr__(self):
+        return f"{type(self).__name__}{hex(self.id)}<{id(self)}>"
+
+    def __str__(self):
+        out  = f"Parameter {hex(self.id)} {id(self)}" + "\n"
+        if self.is_valid:
+            out += f"  Value: {utils.format_bytes(self.data)}"
+        else:
+            out += f"  Invalid"
 
     @staticmethod
     def from_bytes(b):

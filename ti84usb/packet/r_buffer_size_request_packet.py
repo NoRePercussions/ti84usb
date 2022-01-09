@@ -1,4 +1,4 @@
-from ti84usb import packet
+from ti84usb import packet, utils
 
 
 class BufferSizeRequestPacket(packet.Packet):
@@ -10,6 +10,11 @@ class BufferSizeRequestPacket(packet.Packet):
 
     def _raw_data(self):
         return self.buffer_size.to_bytes(4, 'big')
+
+    def __str__(self):
+        out  = f"Buffer Size Request Packet {id(self)}" + "\n"
+        out += f"  Requested buffer size: {self.buffer_size} bytes"
+        return out
 
     @staticmethod
     def from_bytes(b):

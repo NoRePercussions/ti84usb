@@ -1,14 +1,15 @@
-from ti84usb.packet import VirtualPacket, VariableHeaderPacket
+from ti84usb import packet, utils
 from ti84usb.types import Attribute
 
 
-class RequestToSendVariablePacket(VirtualPacket):
+class RequestToSendVariablePacket(packet.VirtualPacket):
     type = 4
     subtype = 0x000B
 
     name: str
     attribs: list
-    varize: int
+
+    size: int
     constant = b'\x01'
 
     def __init__(self, name, size, attribs=None):
@@ -57,6 +58,19 @@ class RequestToSendVariablePacket(VirtualPacket):
     def _byte_attribs(self):
         return [a.bytes_assuming_valid() for a in self.attribs]
 
+    def __str__(self):
+        out  = f"Request to Send Variable Packet {id(self)}" + "\n"
+        out += f"  Name: {self.name}" + "\n"
+        out += f"  Size: {self.size}" + "\n"
+        out += f"  Attributes:"
+        for a in self.attribs:
+            if a.is_valid:
+                out += f"\n    {a.id}: {utils.format_bytes(a.data)}"
+            else:
+                out += f"\n    {a.id}: Invalid"
+        out += f"\n  Constant: {self.constant}"
+        return out
+
     @staticmethod
     def from_bytes(b):
         assert len(b) > 6, "Invalid packet: too small"  # Extra byte in header
@@ -76,7 +90,7 @@ class RequestToSendVariablePacket(VirtualPacket):
         a_start = size_end + 2
         for i in range(num_attribs):
             a_new = Attribute.from_bytes_assuming_valid(b[a_start:])
-            a_start += len(bytes(a_new))
+            a_start += len(a_new.bytes_assuming_valid())
             attribs += [a_new]
 
         return RequestToSendVariablePacket(

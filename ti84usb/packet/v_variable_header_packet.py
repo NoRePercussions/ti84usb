@@ -50,6 +50,17 @@ class VariableHeaderPacket(VirtualPacket):
     def _byte_attribs(self):
         return [bytes(a) for a in self.attribs]
 
+    def __str__(self):
+        out  = f"Variable Header Packet {id(self)}" + "\n"
+        out += f"  Name: {self.name}" + "\n"
+        out += f"  Attributes:"
+        for a in self.attribs:
+            if a.is_valid:
+                out += f"\n    {a.id}: 0x{a.data.hex()}"
+            else:
+                out += f"\n    {a.id}: Invalid"
+        return out
+
     @staticmethod
     def from_bytes(b):
         assert len(b) > 6, "Invalid packet: too small"  # Extra byte in header

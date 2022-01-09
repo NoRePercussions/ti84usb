@@ -1,10 +1,10 @@
-from ti84usb import packet
-from warnings import warn
+from ti84usb import packet, utils
 
 
 class VirtualPacket(packet.Packet):
     type: int
     data: bytes
+    subtype: int = None
 
     def __init__(self, data, is_final=True):
         self.type = 4 if is_final else 3
@@ -51,6 +51,12 @@ class VirtualPacket(packet.Packet):
             concat
         )
 
+    def __str__(self):
+        out  = f"Generic Virtual Packet {id(self)}" + "\n"
+        out += f"  Subtype: {self.subtype}" + "\n"
+        out += f"  Data: {utils.format_bytes(self.data)}"
+        return out
+
     @staticmethod
     def from_bytes(b, auto_type=True):
         # Determine if this is a valid vpacket
@@ -69,9 +75,12 @@ class VirtualPacket(packet.Packet):
             0x000A: packet.VariableHeaderPacket,
             0x000B: packet.RequestToSendVariablePacket,
 
+            0x000E: packet.SetParameterPacket,
+
             0x0012: packet.AckSetModePacket,
             0xAA00: packet.AckDataPacket,
             0xBB00: packet.ExpectedDelayPacket,
+            0xEE00: packet.ErrorPacket,
         }
 
         if auto_type and is_valid and t in types:

@@ -3,6 +3,12 @@ from ti84usb.types import *
 
 # Attribute and Parameter are the same
 class Attribute(Parameter):
+    def __str__(self):
+        out  = f"Parameter {hex(self.id)} {id(self)}" + "\n"
+        if self.is_valid:
+            out += f"  Value: {utils.format_bytes(self.data)}"
+        else:
+            out += f"  Invalid"
 
     @staticmethod
     def from_bytes(b):

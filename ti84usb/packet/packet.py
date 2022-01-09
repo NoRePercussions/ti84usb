@@ -1,10 +1,10 @@
 import ti84usb as ti
-import ti84usb.util as util
+from ti84usb import utils
 import ti84usb.packet as packet
 from warnings import warn
 
 class Packet:
-    type: int
+    type: int = None
     data: bytes
 
     def __init__(self, type=None, data=None):
@@ -25,7 +25,16 @@ class Packet:
         return b''.join(self._list())
 
     def __str__(self):
-        return "  ".join([util.format_bytes(b) for b in self._list()])
+        out  = f"Generic packet {id(self)}" + "\n"
+        out += f"  Type: {self.type}" + "\n"
+        out += f"  Data: {utils.format_bytes(self.data)}"
+        return out
+
+    def __repr__(self):
+        return f"{type(self).__name__}<{id(self)}>"
+
+    def hex(self):
+        return "  ".join([utils.format_bytes(b) for b in self._list()])
 
     def _raw_data(self):
         return self.data

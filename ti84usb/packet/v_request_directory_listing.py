@@ -1,7 +1,7 @@
-from ti84usb.packet import VirtualPacket
+from ti84usb import packet, utils
 
 
-class RequestDirectoryListingPacket(VirtualPacket):
+class RequestDirectoryListingPacket(packet.VirtualPacket):
     type = 4
     subtype = 0x0009
 
@@ -37,6 +37,12 @@ class RequestDirectoryListingPacket(VirtualPacket):
 
     def _byte_params(self):
         return [p.to_bytes(2, 'big') for p in self.attribs]
+
+    def __str__(self):
+        out  = f"Request Directory Listing Packet {id(self)}" + "\n"
+        out += f"  Attributes: {self.attribs}" + "\n"
+        out += f"  Constant: {self.constant}"
+        return out
 
     @staticmethod
     def from_bytes(b):

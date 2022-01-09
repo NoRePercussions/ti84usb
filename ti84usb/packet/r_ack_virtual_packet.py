@@ -1,4 +1,4 @@
-from ti84usb import packet
+from ti84usb import packet, utils
 from warnings import warn
 
 
@@ -18,6 +18,11 @@ class AckVirtualPacket(packet.Packet):
             self.type   .to_bytes(1, 'big'),
             self._raw_data()
         ]
+
+    def __str__(self):
+        out  = f"ACK Virtual Packet {id(self)}" + "\n"
+        out += f"  Data: {utils.format_bytes(self.data)}"
+        return out
 
     @staticmethod
     def from_bytes(b):
