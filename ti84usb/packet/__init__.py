@@ -17,7 +17,7 @@ from .v_request_directory_listing import RequestDirectoryListingPacket
 from .v_variable_header_packet import VariableHeaderPacket
 from .v_request_to_send_variable import RequestToSendVariablePacket
 # 0x000C
-from .v_variable_contents_packet import VariableContentsPacket
+from .v_variable_content_packet import VariableContentPacket
 from .v_set_parameter_packet import SetParameterPacket
 # 0x0010
 # 0x0011

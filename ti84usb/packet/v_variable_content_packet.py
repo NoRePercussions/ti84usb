@@ -1,7 +1,7 @@
 from ti84usb import packet, utils
 
 
-class VariableContentsPacket(packet.VirtualPacket):
+class VariableContentPacket(packet.VirtualPacket):
     type = 4
     subtype = 0x0009
 
