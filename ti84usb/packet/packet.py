@@ -31,7 +31,7 @@ class Packet:
         return out
 
     def __repr__(self):
-        return f"{type(self).__name__}<{id(self)}>"
+        return f"<{type(self).__name__} {id(self)}>"
 
     def hex(self):
         return "  ".join([utils.format_bytes(b) for b in self._list()])
