@@ -33,7 +33,7 @@ class RequestToSendVariablePacket(packet.VirtualPacket):
             len(self._raw_data()).to_bytes(4, 'big'),
             self.subtype      .to_bytes(2, 'big'),
             len(self.name).to_bytes(2, 'big'),
-            self.name.encode('ascii'), b'\x00',
+            self.name.encode('utf-8'), b'\x00',
             self.size.to_bytes(4, 'big'), self.constant,
             self._num_attribs().to_bytes(2, 'big'),
             *self._byte_attribs()
@@ -41,7 +41,7 @@ class RequestToSendVariablePacket(packet.VirtualPacket):
 
     def _raw_data(self):
         out = len(self.name).to_bytes(2, 'big')
-        out += self.name.encode('ascii') + b'\x00'
+        out += self.name.encode('utf-8') + b'\x00'
 
         out += self.size.to_bytes(4, 'big')
         out += self.constant
@@ -83,7 +83,7 @@ class RequestToSendVariablePacket(packet.VirtualPacket):
         name_end = 14 + int.from_bytes(b[11:13], 'big')
         size_end = 14 + 5 + int.from_bytes(b[11:13], 'big')
         size = int.from_bytes(b[name_end:name_end+4], 'big')
-        name = b[13:name_end-1].decode("ascii")
+        name = b[13:name_end-1].decode("utf-8")
 
         num_attribs = int.from_bytes(b[size_end:size_end+2], 'big')
         attribs = []

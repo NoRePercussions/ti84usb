@@ -29,14 +29,14 @@ class VariableHeaderPacket(VirtualPacket):
             len(self._raw_data()).to_bytes(4, 'big'),
             self.subtype      .to_bytes(2, 'big'),
             len(self.name).to_bytes(2, 'big'),
-            self.name.encode('ascii'), b'\x00',
+            self.name.encode('utf-8'), b'\x00',
             self._num_attribs().to_bytes(2, 'big'),
             *self._byte_attribs()
         ]
 
     def _raw_data(self):
         out = len(self.name).to_bytes(2, 'big')
-        out += self.name.encode('ascii') + b'\x00'
+        out += self.name.encode('utf-8') + b'\x00'
 
         num_params = self._num_attribs()
         out += num_params.to_bytes(2, 'big')
@@ -56,9 +56,7 @@ class VariableHeaderPacket(VirtualPacket):
         out += f"  Attributes:"
         for a in self.attribs:
             if a.is_valid:
-                out += f"\n    {a.id}: 0x{a.data.hex()}"
-            else:
-                out += f"\n    {a.id}: Invalid"
+                out += f"\n    {a}"
         return out
 
     @staticmethod
@@ -71,7 +69,7 @@ class VariableHeaderPacket(VirtualPacket):
         # LL LL LL LL  TT  LL LL LL LL  TT TT  LL?LL NN NN... 00  NN NN (II II VV [ LL LL DD DD ...] ))
 
         name_end = 14 + int.from_bytes(b[11:13], 'big')
-        name = b[13:name_end-1].decode("ascii")
+        name = b[13:name_end-1].decode("utf-8")
 
         num_attribs = int.from_bytes(b[name_end:name_end+2], 'big')
         attribs = []
