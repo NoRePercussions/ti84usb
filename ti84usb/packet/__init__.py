@@ -24,5 +24,5 @@ from .v_set_parameter_packet import SetParameterPacket
 from .v_ack_set_mode_packet import AckSetModePacket
 from .v_ack_data_packet import AckDataPacket
 from .v_expected_delay_packet import ExpectedDelayPacket
-# 0xDD00
+from .v_EOT_packet import EOTPacket
 from .v_error_packet import ErrorPacket

@@ -80,6 +80,8 @@ class VirtualPacket(packet.Packet):
             0x0012: packet.AckSetModePacket,
             0xAA00: packet.AckDataPacket,
             0xBB00: packet.ExpectedDelayPacket,
+
+            0xDD00: packet.EOTPacket,
             0xEE00: packet.ErrorPacket,
         }
 

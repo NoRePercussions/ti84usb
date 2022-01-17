@@ -1,4 +1,5 @@
 from ti84usb.types import *
+from ti84usb import utils
 
 
 # Attribute and Parameter are the same
@@ -9,6 +10,32 @@ class Attribute(Parameter):
             out += f"  Value: {utils.format_bytes(self.data)}"
         else:
             out += f"  Invalid"
+
+    def __str__(self):
+        human_readable_attribs = {
+            0x01: "Variable size",
+            0x02: "Variable type",
+            0x03: "Variable is archived",
+            0x04: "Unknown",
+            0x05: "AppVar source",
+            0x08: "Variable is 83+ or 84+ only",
+            0x11: "Variable type (request)",
+            0x13: "Unknown (for deleting)",
+            0x41: "Variable is locked",
+            0x42: "Unknown",
+        }
+
+        if self.id in human_readable_attribs:
+            start = f"Attribute {hex(self.id)} ({human_readable_attribs[self.id]}): "
+        else:
+            start = f"Attribute {hex(self.id)} (Unknown):" + "\n"
+
+        if self.is_valid:
+            end = f"{utils.format_bytes(self.data)}"
+        else:
+            end = f"Invalid"
+
+        return start + end
 
     @staticmethod
     def from_bytes(b):

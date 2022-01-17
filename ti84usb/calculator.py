@@ -107,6 +107,14 @@ class Calculator:
         logging.debug(f"Writing packet: {repr(packet)}")
         self.write_bytes(bytes(packet), timeout_ms=timeout_ms)
 
+        if isinstance(packet, VirtualPacket):
+            try:
+                ack = self.read_packet()
+            except usb.core.USBTimeoutError:
+                raise AssertionError("Virtual packet acknowledgement not received")
+            assert isinstance(ack, AckVirtualPacket), "Virtual packet acknowledgement not received"
+            logging.debug("Received virtual packet acknowledgement")
+
     def read_bytes(self, timeout_ms=None):
         read = bytes(self.read_ep.read(self.buffer_size, timeout=timeout_ms))
         logging.debug(f"Read bytes: {utils.format_bytes(read)}")
@@ -115,6 +123,10 @@ class Calculator:
     def read_packet(self, timeout_ms=None):
         p = Packet.from_bytes(self.read_bytes(timeout_ms=timeout_ms))
         logging.debug(f"Read packet: {repr(p)}")
+
+        if isinstance(p, VirtualPacket):
+            logging.debug("Sending virtual packet acknowledgement")
+            self.write_packet(AckVirtualPacket())
         return p
 
     #########################
@@ -128,6 +140,38 @@ class Calculator:
         self.write_packet(BufferSizeRequestPacket(buffer_size=buffer_size))
 
         recv: BufferSizeAllocationPacket = self.read_packet()
+        assert not isinstance(recv, ErrorPacket), f"Error received: \n{ErrorPacket}"
         self.buffer_size = recv.buffer_size
         logging.debug(f"Negotiated buffer size {self.buffer_size} bytes")
+
+    def ping_and_set_mode(self, mode=3):
+        mode_lookup_table = {
+            1: "1: Startup mode",
+            2: "2: Basic mode",
+            3: "3: Normal mode",
+        }
+
+        if mode in mode_lookup_table:
+            logging.debug(f"Setting mode {mode_lookup_table[mode]}")
+        else:
+            logging.debug(f"Setting unknown mode {mode}")
+
+        self.write_packet(SetModePacket(mode))
+        recv: AckSetModePacket = self.read_packet()
+        assert not isinstance(recv, ErrorPacket), f"Error received: \n{ErrorPacket}"
+        logging.debug(f"Mode set")
+
+
+    def get_directory_listing(self, attribs='all'):
+        logging.debug("Requesting directory listing")
+        self.write_packet(RequestDirectoryListingPacket(attribs))
+
+        # Recieve header packets:
+        header_packets = []
+        recv = None
+        while not isinstance(recv, EOTPacket):
+            recv = self.read_packet()
+            assert not isinstance(recv, ErrorPacket), f"Error received: \n{ErrorPacket}"
+            header_packets += [recv]
+        return header_packets[:-1]
 

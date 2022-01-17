@@ -9,7 +9,9 @@ class RequestDirectoryListingPacket(packet.VirtualPacket):
     constant = b'\x00\x01\x00\x01\x00\x01\x01'
 
     def __init__(self, attribs):
-        if type(attribs) is not list:
+        if attribs is 'all':
+            self.attribs = [0x01, 0x02, 0x03, 0x04, 0x05, 0x08, 0x11, 0x13, 0x41, 0x42]
+        elif type(attribs) is not list:
             self.attribs = [attribs]
         elif type(attribs[0]) is int:
             self.attribs = attribs
